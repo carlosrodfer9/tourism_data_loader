@@ -27,5 +27,3 @@ for _ in range(10):  # Generar 10 mensajes
     time.sleep(2)
 
 producer.flush()
-
-csjadocijsdicjdsoakcds
