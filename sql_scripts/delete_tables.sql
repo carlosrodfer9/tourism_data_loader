@@ -1,0 +1,12 @@
+DROP TABLE Fact_Vuelo; 
+DROP TABLE Fact_Reserva; 
+DROP TABLE Fact_RedesSociales; 
+DROP TABLE Fact_Transporte;
+DROP TABLE Dim_Aeropuerto;
+DROP TABLE Dim_Hora; 
+DROP TABLE Dim_Ubicacion;
+DROP TABLE Dim_Avion;
+DROP TABLE Dim_Fecha; 
+DROP TABLE Dim_Vehiculo; 
+DROP TABLE Dim_Alojamiento; 
+DROP TABLE Dim_Ciudad; 
