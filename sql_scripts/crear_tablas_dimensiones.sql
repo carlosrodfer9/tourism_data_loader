@@ -12,7 +12,7 @@ CREATE TABLE Dim_Aeropuerto (
 );
 
 CREATE TABLE Dim_Hora (
-    D_Hora SERIAL PRIMARY KEY,
+    ID_Hora TEXT PRIMARY KEY,  
     Hora INT NOT NULL,
     Minuto INT NOT NULL,
     Segundo INT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE Dim_Fecha (
 
 CREATE TABLE Dim_Vehiculo (
     ID_Vehiculo SERIAL PRIMARY KEY,
-    Matricula VARCHAR(20) NOT NULL UNIQUE,
+    Matricula VARCHAR(20),
     Categoria_Vehiculo VARCHAR(50) NOT NULL
 );
 

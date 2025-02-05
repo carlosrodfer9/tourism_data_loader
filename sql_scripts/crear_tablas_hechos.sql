@@ -32,7 +32,7 @@ CREATE TABLE Fact_Transporte (
     ID_Transporte SERIAL PRIMARY KEY,
     N_Personas INT NOT NULL,
     ID_Fecha INT NOT NULL REFERENCES Dim_Fecha(ID_Fecha),
-    ID_Hora INT NOT NULL REFERENCES Dim_Hora(D_Hora),
+    ID_Hora INT NOT NULL REFERENCES Dim_Hora(ID_Hora),
     ID_Ciudad INT NOT NULL REFERENCES Dim_Ciudad(ID_Ciudad),
     ID_Vehiculo INT NOT NULL REFERENCES Dim_Vehiculo(ID_Vehiculo),
     ID_Ubicacion INT NOT NULL REFERENCES Dim_Ubicacion(ID_Ubicacion)
