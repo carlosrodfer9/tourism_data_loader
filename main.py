@@ -24,6 +24,10 @@ def main():
             load_dims.load_airport_data("./data/infovuelos_sample.csv")
         elif args.dim == "avion":
             load_dims.load_plane_data("./data/infovuelos_sample.csv")
+        elif args.dim == "ciudad":
+            load_dims.load_city_data("./data/dim_ciudad.csv")
+        elif args.dim == "vehiculo":
+            load_dims.load_vehicle_data("./data/dim_vehiculo.csv")
     #elif args.live:
 #
     else:
