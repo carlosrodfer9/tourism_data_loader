@@ -12,7 +12,7 @@ config = {
 
 def consume_live_data():
     consumer = Consumer(config)
-    consumer.subscribe(['transport'])
+    consumer.subscribe(['flight'])
     try:
         while True:
             msg = consumer.poll(1.0)
@@ -31,27 +31,29 @@ def consume_live_data():
             with utils.init_connection() as conn:
                 cursor = conn.cursor()
                 columns = [
-                    'ID_Transporte',
-                    'ID_Fecha',
-                    'ID_Hora',
-                    'ID_Ciudad',
-                    'ID_Vehiculo',
-                    'ID_Ubicacion',
-                    'N_Personas'
+                    "id_vuelo", 
+                    "n_pasajeros", 
+                    "id_fecha", 
+                    "id_aeropuerto_origen", 
+                    "id_aeropuerto_destino",
+                    "id_hora_salida",
+                    "id_hora_llegada",
+                    "id_avion"
                 ]
                 try:
                     # Obtener las claves foráneas de las tablas de dimensiones (si ya existen)
-                    id_fecha = data['ID_Fecha']
-                    id_hora = data['ID_Hora']
-                    id_ciudad = data['ID_Ciudad']
-                    id_vehiculo = data['ID_Vehiculo']
-                    id_ubicacion = data['ID_Ubicacion']
-                    n_personas = data['N_Personas']
-                    id_transporte = utils.encrypt_key([id_fecha, id_hora, id_ciudad, id_vehiculo, id_ubicacion, n_personas])
+                    n_pasajeros = data['N_Pasajeros']
+                    fecha = data['ID_Fecha']
+                    aeropuerto_origen = data['ID_Aeropuerto_Origen']
+                    aeropuerto_dest = data['ID_Aeropuerto_Destino']
+                    hora_salida = data['ID_Hora_Salida']
+                    hora_llegada= data['ID_Hora_Llegada']
+                    avion = data['ID_Avion']
+                    id_vuelo = utils.encrypt_key([fecha, aeropuerto_origen, aeropuerto_dest, hora_salida, hora_llegada, avion])
 
-                    utils.insert_values("fact_transporte", columns, [id_transporte, id_fecha, id_hora, id_ciudad, id_vehiculo, id_ubicacion, n_personas], cursor)
+                    utils.insert_values("fact_vuelo", columns, [id_vuelo, n_pasajeros, fecha, aeropuerto_origen, aeropuerto_dest, hora_salida, hora_llegada, avion], cursor)
 
-                    print(f"Insertando datos de vuelo {id_transporte}, {n_personas}, {id_ciudad}, {id_fecha}")
+                    print(f"Insertando datos de vuelo {id_vuelo}, {n_pasajeros}, {aeropuerto_origen}, {aeropuerto_dest}")
                 except Exception as e:
                     print(f"Error al insertar datos: {e}")
                 finally:

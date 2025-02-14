@@ -12,7 +12,7 @@ config = {
 
 def consume_live_data():
     consumer = Consumer(config)
-    consumer.subscribe(['transport'])
+    consumer.subscribe(['reservation'])
     try:
         while True:
             msg = consumer.poll(1.0)
@@ -31,27 +31,24 @@ def consume_live_data():
             with utils.init_connection() as conn:
                 cursor = conn.cursor()
                 columns = [
-                    'ID_Transporte',
+                    'Precio_Noche',
+                    'N_Noches',
                     'ID_Fecha',
-                    'ID_Hora',
                     'ID_Ciudad',
-                    'ID_Vehiculo',
-                    'ID_Ubicacion',
-                    'N_Personas'
+                    'ID_Alojamiento'
                 ]
                 try:
                     # Obtener las claves foráneas de las tablas de dimensiones (si ya existen)
+                    precio = data['Precio_Noche']
+                    n_noches = data['N_Noches']
                     id_fecha = data['ID_Fecha']
-                    id_hora = data['ID_Hora']
                     id_ciudad = data['ID_Ciudad']
-                    id_vehiculo = data['ID_Vehiculo']
-                    id_ubicacion = data['ID_Ubicacion']
-                    n_personas = data['N_Personas']
-                    id_transporte = utils.encrypt_key([id_fecha, id_hora, id_ciudad, id_vehiculo, id_ubicacion, n_personas])
+                    id_alojamiento = data['ID_Alojamiento']
+                    id_reserva = utils.encrypt_key([precio, n_noches, id_fecha, id_ciudad, id_alojamiento])
 
-                    utils.insert_values("fact_transporte", columns, [id_transporte, id_fecha, id_hora, id_ciudad, id_vehiculo, id_ubicacion, n_personas], cursor)
+                    utils.insert_values("fact_reserva", columns, [id_reserva, precio, n_noches, id_fecha, id_ciudad, id_alojamiento], cursor)
 
-                    print(f"Insertando datos de vuelo {id_transporte}, {n_personas}, {id_ciudad}, {id_fecha}")
+                    print(f"Insertando datos de vuelo {id_reserva}, {id_alojamiento}, {id_ciudad}, {id_fecha}")
                 except Exception as e:
                     print(f"Error al insertar datos: {e}")
                 finally:

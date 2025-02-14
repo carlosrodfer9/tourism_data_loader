@@ -51,7 +51,7 @@ def read_values(table_name: str, columns: list[str], cursor):
 
         return values
     except Exception as e:
-        print(f"Error al insertar datos: {e}")
+        print(f"Error al leer datos: {e}")
         raise e
     
 
