@@ -29,11 +29,11 @@ CREATE TABLE Fact_RedesSociales (
 
 
 CREATE TABLE Fact_Transporte (
-    ID_Transporte SERIAL PRIMARY KEY,
+    ID_Transporte VARCHAR PRIMARY KEY,
     N_Personas INT NOT NULL,
-    ID_Fecha INT NOT NULL REFERENCES Dim_Fecha(ID_Fecha),
-    ID_Hora INT NOT NULL REFERENCES Dim_Hora(ID_Hora),
-    ID_Ciudad INT NOT NULL REFERENCES Dim_Ciudad(ID_Ciudad),
-    ID_Vehiculo INT NOT NULL REFERENCES Dim_Vehiculo(ID_Vehiculo),
-    ID_Ubicacion INT NOT NULL REFERENCES Dim_Ubicacion(ID_Ubicacion)
+    ID_Fecha VARCHAR NOT NULL REFERENCES Dim_Fecha(ID_Fecha),
+    ID_Hora TEXT NOT NULL REFERENCES Dim_Hora(ID_Hora),
+    ID_Ciudad VARCHAR NOT NULL REFERENCES Dim_Ciudad(ID_Ciudad),
+    ID_Vehiculo VARCHAR NOT NULL REFERENCES Dim_Vehiculo(ID_Vehiculo),
+    ID_Ubicacion INT 
 );
