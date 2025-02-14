@@ -8,7 +8,7 @@ CREATE TABLE Dim_Ciudad (
 CREATE TABLE Dim_Aeropuerto (
     ID_Aeropuerto VARCHAR PRIMARY KEY,
     Nombre VARCHAR(150) NOT NULL,
-    ID_Ciudad INT REFERENCES Dim_Ciudad(ID_Ciudad)
+    ID_Ciudad VARCHAR REFERENCES Dim_Ciudad(ID_Ciudad)
 );
 
 CREATE TABLE Dim_Hora (
@@ -18,14 +18,6 @@ CREATE TABLE Dim_Hora (
     Segundo INT NOT NULL,
     AM BOOLEAN NOT NULL,
     Epoch BIGINT NOT NULL
-);
-
-CREATE TABLE Dim_Ubicacion (
-    ID_Ubicacion VARCHAR PRIMARY KEY,
-    Ubicacion VARCHAR(200) NOT NULL,
-    Latitud NUMERIC(10, 6) NOT NULL,
-    Longitud NUMERIC(10, 6) NOT NULL,
-    ID_Ciudad INT NOT NULL REFERENCES Dim_Ciudad(ID_Ciudad)
 );
 
 CREATE TABLE Dim_Avion (
