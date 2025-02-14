@@ -9,12 +9,12 @@ def load_flight_data(path: str):
     data = pd.read_csv(path, sep=";")
 
     flights = data.loc[:, [
-        "plane", 
-        "dep_date", 
-        "dep_time", 
-        "dep_airport_name", 
-        "arr_time", 
-        "arr_airport_name"
+        "dep_date",
+        "dep_airport_name",
+        "arr_airport_name",
+        "dep_time",  
+        "arr_time",
+        "plane"
     ]]
 
     columns = [
