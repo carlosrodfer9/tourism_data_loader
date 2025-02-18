@@ -1,8 +1,10 @@
 import pandas as pd
 import psycopg2
-from datetime import datetime
+import datetime
 import utils
 import random
+import time
+import re
 
 
 def load_flight_data(path: str):
@@ -32,17 +34,32 @@ def load_flight_data(path: str):
         cursor = conn.cursor()
         try:
             for _, flight in flights.iterrows():
+                if re.match('-', flight.loc["dep_date"]):
+                    continue
+                date_old = datetime.datetime.strptime(flight.loc["dep_date"], "%d/%m/%y")
+
+                if re.match('-', flight.loc["dep_time"]):
+                    dep_time = None
+                else:
+                    dep_time_old = datetime.datetime.strptime(flight.loc["dep_time"], "%H:%M")
+                    dep_time = dep_time_old.strftime("%H:%M:%S")
+
+                if re.match('-', flight.loc["arr_time"]):
+                    arr_time = None
+                else:
+                    arr_time_old = datetime.datetime.strptime(flight.loc["arr_time"], "%H:%M")
+                    arr_time = arr_time_old.strftime("%H:%M:%S")
                 utils.insert_values(
                     "fact_vuelo",
                     columns,
                     [
                         utils.encrypt_key(flight.tolist()),
                         random.randint(30, 100),
-                        flight.loc["dep_date"],
+                        date_old.strftime("%Y-%m-%d"),
                         utils.encrypt_key(flight.loc["dep_airport_name"]),
                         utils.encrypt_key(flight.loc["arr_airport_name"]),
-                        flight.loc["dep_time"],
-                        flight.loc["arr_time"],
+                        dep_time,
+                        arr_time,
                         utils.encrypt_key(str(flight.loc["plane"]).strip())
                     ],
                     cursor

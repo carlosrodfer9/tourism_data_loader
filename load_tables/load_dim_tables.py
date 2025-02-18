@@ -36,7 +36,7 @@ def load_hour_data():
 
 def load_date_data():
     # dates de inicio y fin
-    date = datetime.date(2020, 1, 1)
+    date = datetime.date(2018, 1, 1)
     fin_date = datetime.date(2030, 12, 31)
 
     columns = ["ID_Fecha", "Dia", "Mes", "Año", "NombreDia", "NombreMes", "DiaSemana", "Trimestre", "MesTrimestre"]
@@ -177,7 +177,7 @@ def load_airport_data(path: str):
                         break
                 if airport == '':
                     break
-                utils.insert_values("dim_aeropuerto", columns, [utils.encrypt_key([airport, city]), airport, city], cursor)
+                utils.insert_values("dim_aeropuerto", columns, [utils.encrypt_key(airport), airport, city], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")
         finally:
@@ -196,8 +196,6 @@ def load_plane_data(path: str):
         try:
             for plane in planes:
                 plane = str(plane).strip()
-                if plane == '':
-                    break
                 utils.insert_values("dim_avion", columns, [utils.encrypt_key(plane), plane], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")

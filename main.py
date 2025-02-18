@@ -53,11 +53,11 @@ def main():
             print(f"La dimensión {args.dim} no existe")
     elif args.produce != None:
         if args.produce == "vuelo":
-            producer_vuelo.produce_live_data()
+            producer_vuelo.produce_live_data(100)
         elif args.produce == "transporte":
-            producer_transporte.produce_live_data()
+            producer_transporte.produce_live_data(100)
         elif args.produce == "reserva":
-            producer_reserva.produce_live_data()
+            producer_reserva.produce_live_data(100)
         else:
             print(f"No existen datos en tiempo real para {args.live}")
     elif args.consume != None:

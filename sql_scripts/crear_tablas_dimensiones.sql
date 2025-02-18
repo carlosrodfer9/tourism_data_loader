@@ -22,7 +22,7 @@ CREATE TABLE Dim_Hora (
 
 CREATE TABLE Dim_Avion (
     ID_Avion VARCHAR PRIMARY KEY,
-    Aerolinea VARCHAR(100) NOT NULL
+    Avion VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Dim_Fecha (

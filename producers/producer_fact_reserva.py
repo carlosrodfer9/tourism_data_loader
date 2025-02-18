@@ -49,10 +49,10 @@ def _generate_reservation_data():
         'ID_Alojamiento': accomodations[random.randint(1, len(accomodations))][0] 
     }
 
-def produce_live_data():
+def produce_live_data(n_messages: int):
     # Envío de datos al tema 'flight_data'
     _read_values_from_db()
-    for i in range(10):  # Generar 10 mensajes
+    for i in range(n_messages):  # Generar 10 mensajes
         data = _generate_reservation_data()
         producer.produce('reservation', value=json.dumps(data).encode('utf-8'))
         print(f"Produciendo datos de reservas: {data}")

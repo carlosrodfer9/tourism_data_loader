@@ -50,10 +50,10 @@ def _generate_transport_data():
         'ID_Ubicacion': None
     }
 
-def produce_live_data():
+def produce_live_data(n_messages: int):
     # Envío de datos al tema 'flight_data'
     _read_values_from_db()
-    for i in range(10):  # Generar 10 mensajes
+    for i in range(n_messages):  # Generar 10 mensajes
         data = _generate_transport_data()
         producer.produce('transport', value=json.dumps(data).encode('utf-8'))
         print(f"Produciendo datos de transporte: {data}")
