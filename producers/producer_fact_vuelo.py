@@ -2,7 +2,7 @@ from confluent_kafka import Producer
 import json
 import random
 import time
-from datetime import datetime, timedelta
+import datetime
 import utils
 
 # Configuración del productor
@@ -35,12 +35,12 @@ def _generate_flight_data():
     print(airports[random.randint(1, len(airports)-1)][0])
     return {
         'N_Pasajeros': random.randint(50, 300),
-        'ID_Fecha': random.randint(1, 365),  
+        'ID_Fecha': datetime.date.today().isoformat(),  
         'ID_Aeropuerto_Origen': airports[random.randint(1, len(airports)-1)][0], 
         'ID_Aeropuerto_Destino': airports[random.randint(1, len(airports)-1)][0],
-        'ID_Hora_Salida': random.randint(1, 1440),  # Hora en minutos del día
-        'ID_Hora_Llegada': random.randint(1, 1440),
-        'ID_Avion': planes[random.randint(1, len(planes))][0] 
+        'ID_Hora_Salida': (datetime.datetime.now() - datetime.timedelta(hours=random.randint(0,7))).strftime("%H:%M:%S"),
+        'ID_Hora_Llegada': datetime.time(datetime.datetime.now().day, datetime.datetime.now().minute, datetime.datetime.now().second).isoformat(),
+        'ID_Avion': planes[random.randint(1, len(planes)-1)][0] 
     }
 
 def produce_live_data(n_messages: int):
