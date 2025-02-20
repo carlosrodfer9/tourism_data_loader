@@ -1,4 +1,6 @@
 import argparse
+import sql_scripts.create_tables as create_tables
+import sql_scripts.delete_tables as delete_tables
 import load_tables.load_fact_tables as load_facts
 import load_tables.load_dim_tables as load_dims
 import producers.producer_fact_vuelo as producer_vuelo
@@ -17,6 +19,8 @@ def main():
     options.add_argument('-d', '--dim', type=str, help= "Cargar tablas de dimensiones: ['aeropuerto', 'avion', 'ciudad', 'alojamiento', 'vehiculo', 'fecha', 'hora', 'all']")
     options.add_argument('-p', '--produce', type=str, help= "Iniciar flujo en tiempo real: ['vuelo', 'reserva', 'transporte']")
     options.add_argument('-c', '--consume', type=str, help= "Iniciar a consumir flujo de datos en tiempo real: ['vuelo', 'reserva', 'transporte']")
+    options.add_argument('-t', '--tables', action='store_true', help="Crear tablas de dimensiones y hechos")
+    options.add_argument('-dt', '--delete', action='store_true', help="Borrar todas las tablas")
 
 
     args = parser.parse_args()
@@ -69,8 +73,24 @@ def main():
             consumer_reserva.consume_live_data()
         else:
             print(f"No existen datos en tiempo real para {args.live}")
+
+    elif args.tables:
+        print("Creando tablas...")
+        try:
+            create_tables.crear_tablas()
+        except Exception as e:
+            print(f"Hubo un error al crear las tablas: {e}")
+
+    elif args.delete:
+        print("Eliminando tablas...")
+        try:
+            delete_tables.borrar_tablas()
+        except Exception as e:
+            print(f"Hubo un error al eliminar las tablas: {e}")
     else:
         print("El argumento no es correcto")
+
+    
 
 
 if __name__ == "__main__":
