@@ -28,6 +28,8 @@ def main():
     if args.fact != None:
         if args.fact == "vuelo":
             load_facts.load_flight_data("./data/infovuelos_sample.csv")
+        elif args.fact == "transporte":
+            load_facts.load_transport_data("./data/dim_vehiculo.csv")
         else:
             print(f"La tabla de hechos {args.fact} no existe")
     elif args.dim != None:
