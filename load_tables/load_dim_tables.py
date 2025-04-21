@@ -1,11 +1,139 @@
 import pandas as pd
 import psycopg2
-from datetime import datetime
+import datetime
 import utils
+from faker import Faker
+import random
+import re
+
+
+cities_macth = {
+    "A CORUÑA": "A Coruna",
+    "NAPOLES": "Marano di Napoli",
+    "ATENAS": "Athens",
+    "LUXEMBURGO": "Luxembourg",
+    "VIENA": "Vienne",
+    "ESTAMBUL": "Istanbul",
+    "SEUL": "Seoul",
+    "LONDRES": "London",
+    "MOSCU": "Moscow",
+    "CEUTA": "Ciudad de Ceuta",
+    "NUEVA YORK": "New York",
+    "LOGROÑO": "Logrono",
+    "VARSOVIA": "Warsaw",
+    "ESTOCOLMO": "Stockholm",
+    "LISBOA": "Lisbon",
+    "COPENHAGUE": "Copenhagen",
+    "EDIMBURGO": "Edinburgh",
+    "PRAGA": "Prague",
+    "TUNEZ": "Tunis",
+    "CASTELLÓN": "Castellon de la Plana",
+    "TALLIN": "Tallinn",
+    "BELGRADO": "Belgrade",
+    "KIEV": "Kyiv"
+}
+
+def load_hour_data():
+    with utils.init_connection() as conn:
+        cursor = conn.cursor()
+        columns = ["ID_Hora", "Hora", "Minuto", "Segundo", "AM", "Epoch"]
+        try:
+            for hora in range(24):
+                for minuto in range(60):
+                    for segundo in range(60):
+                        am = hora < 12
+                        epoch = hora * 3600 + minuto * 60 + segundo
+                        id_hora = datetime.time(hora, minuto, segundo).isoformat()
+
+                        utils.insert_values(
+                            "dim_hora", 
+                            columns, 
+                            [id_hora, hora, minuto, segundo, am, epoch], 
+                            cursor
+                        )
+
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+        finally:
+            conn.commit()
+            cursor.close()
+
+
+
+def load_date_data():
+    # dates de inicio y fin
+    date = datetime.date(2018, 1, 1)
+    fin_date = datetime.date(2030, 12, 31)
+
+    columns = ["ID_Fecha", "Dia", "Mes", "Año", "NombreDia", "NombreMes", "DiaSemana", "Trimestre", "MesTrimestre"]
+
+    # Insertar datos
+    with utils.init_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            while date <= fin_date:
+                id_date = date.isoformat() #usamos la propia fecha como id
+                day_name = date.strftime('%A')
+                month_name = date.strftime('%B')
+                day_week = date.weekday()  # 0=lunes, 1=martes, ..., 6=domingo
+                quarter = (date.month - 1) // 3 + 1
+                quarter_month = (date.month - 1) % 3 + 1
+
+                utils.insert_values(
+                    "dim_fecha", 
+                    columns, 
+                    [id_date, date.day, date.month, date.year, day_name, month_name, day_week, quarter, quarter_month], 
+                    cursor
+                )
+
+                # Incrementar un día
+                date += datetime.timedelta(days=1)
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+        finally:
+            conn.commit()
+            cursor.close()
+
+
+def load_accomodation_data(path: str):
+    fake = Faker()
+    data = pd.read_csv(path, sep=";", encoding="latin")
+
+    accomodations = data.loc[:, ["alojamiento_tipo", "denominacion"]]
+    types = data.loc[:, "alojamiento_tipo"].unique().tolist()
+
+    columns = ["id_alojamiento", "nombre", "tipo", "id_ciudad"]
+    with utils.init_connection() as conn:
+        cursor = conn.cursor()
+        cities = utils.read_values("dim_ciudad", ["id_ciudad", "ciudad"], cursor)
+        try:
+            for city in cities:
+                if str(city[1]).upper() == "MADRID":
+                    id_madrid = city[0]
+                    break
+            for _, row in accomodations.iterrows():
+                denom = str(row.loc["denominacion"]).strip()
+                if denom == '':
+                    break
+                tipo = str(row.loc["alojamiento_tipo"]).strip()
+                if tipo == 'VIVIENDAS DE USO TU':
+                    tipo = "VIVIENDA TURISTICA"
+                utils.insert_values("dim_alojamiento", columns, [utils.encrypt_key([denom, tipo, id_madrid]), denom, tipo, id_madrid], cursor)
+            for city in cities:
+                for i in range(15):
+                    id_city = city[0]
+                    tipo = types[random.randint(0, len(types) - 1)]
+                    denom = fake.name()
+                    utils.insert_values("dim_alojamiento", columns, [utils.encrypt_key([denom, tipo, id_city]), denom, tipo, id_city], cursor)
+        except Exception as e:
+            print(f"Error al insertar datos: {e}")
+        finally:
+            conn.commit()
+            cursor.close()
 
 
 def load_city_data(path: str):
-    data = pd.read_csv(path, sep=";")
+    data = pd.read_csv(path, sep=",")
 
     cities = data.loc[:, ["Ciudad", "Pais", "Continente"]]
 
@@ -31,7 +159,7 @@ def load_city_data(path: str):
             cursor.close()
 
 def load_vehicle_data(path: str):
-    data = pd.read_csv(path, sep=";")
+    data = pd.read_csv(path, sep=",")
 
     vehicles = data.loc[:, ["Matricula", "Categoria_Vehiculo"]]
 
@@ -46,7 +174,7 @@ def load_vehicle_data(path: str):
                 cat = str(row.loc["Categoria_Vehiculo"]).strip()
                 if cat == '':
                     break
-                utils.insert_values("dim_avion", columns, [utils.encrypt_key([mat, cat]), mat, cat], cursor)
+                utils.insert_values("dim_vehiculo", columns, [utils.encrypt_key([mat, cat]), mat, cat], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")
         finally:
@@ -64,17 +192,27 @@ def load_airport_data(path: str):
     columns = ["id_aeropuerto", "nombre", "id_ciudad"]
     with utils.init_connection() as conn:
         cursor = conn.cursor()
+        cities = utils.read_values("dim_ciudad", ["id_ciudad", "ciudad"], cursor)
         try:
             for airport in airports_all:
                 airport = str(airport).strip()
-                city = airport
+                city_airport = None
+                city = None
+                if re.search(r'-', airport):
+                    city_airport = airport.split('-')[0].strip()
+                elif re.search(r'/', airport):
+                    city_airport = airport.split('/')[0].strip()
+                else:
+                    city_airport = airport
+                if city_airport in cities_macth.keys():
+                    city_airport = cities_macth.get(city_airport)
+                for c in cities:
+                    if re.match(str(c[1]).upper(), city_airport.upper()):
+                        city = c[0]
+                        break
                 if airport == '':
-                    break
-                if '/' in city:
-                    city = city.split('/')[0]
-                elif '-' in city:
-                    city = city.split('-')[0]
-                utils.insert_values("dim_aeropuerto", columns, [utils.encrypt_key(airport), airport, None], cursor)
+                    continue
+                utils.insert_values("dim_aeropuerto", columns, [utils.encrypt_key(airport), airport, city], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")
         finally:
@@ -93,8 +231,6 @@ def load_plane_data(path: str):
         try:
             for plane in planes:
                 plane = str(plane).strip()
-                if plane == '':
-                    break
                 utils.insert_values("dim_avion", columns, [utils.encrypt_key(plane), plane], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")
