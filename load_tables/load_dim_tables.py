@@ -7,6 +7,32 @@ import random
 import re
 
 
+cities_macth = {
+    "A CORUÑA": "A Coruna",
+    "NAPOLES": "Marano di Napoli",
+    "ATENAS": "Athens",
+    "LUXEMBURGO": "Luxembourg",
+    "VIENA": "Vienne",
+    "ESTAMBUL": "Istanbul",
+    "SEUL": "Seoul",
+    "LONDRES": "London",
+    "MOSCU": "Moscow",
+    "CEUTA": "Ciudad de Ceuta",
+    "NUEVA YORK": "New York",
+    "LOGROÑO": "Logrono",
+    "VARSOVIA": "Warsaw",
+    "ESTOCOLMO": "Stockholm",
+    "LISBOA": "Lisbon",
+    "COPENHAGUE": "Copenhagen",
+    "EDIMBURGO": "Edinburgh",
+    "PRAGA": "Prague",
+    "TUNEZ": "Tunis",
+    "CASTELLÓN": "Castellon de la Plana",
+    "TALLIN": "Tallinn",
+    "BELGRADO": "Belgrade",
+    "KIEV": "Kyiv"
+}
+
 def load_hour_data():
     with utils.init_connection() as conn:
         cursor = conn.cursor()
@@ -170,13 +196,22 @@ def load_airport_data(path: str):
         try:
             for airport in airports_all:
                 airport = str(airport).strip()
+                city_airport = None
                 city = None
+                if re.search(r'-', airport):
+                    city_airport = airport.split('-')[0].strip()
+                elif re.search(r'/', airport):
+                    city_airport = airport.split('/')[0].strip()
+                else:
+                    city_airport = airport
+                if city_airport in cities_macth.keys():
+                    city_airport = cities_macth.get(city_airport)
                 for c in cities:
-                    if re.match(str(c[1]).upper(), airport):
+                    if re.match(str(c[1]).upper(), city_airport.upper()):
                         city = c[0]
                         break
                 if airport == '':
-                    break
+                    continue
                 utils.insert_values("dim_aeropuerto", columns, [utils.encrypt_key(airport), airport, city], cursor)
         except Exception as e:
             print(f"Error al insertar datos: {e}")

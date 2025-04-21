@@ -39,7 +39,7 @@ def _generate_flight_data():
         'ID_Aeropuerto_Origen': airports[random.randint(1, len(airports)-1)][0], 
         'ID_Aeropuerto_Destino': airports[random.randint(1, len(airports)-1)][0],
         'ID_Hora_Salida': (datetime.datetime.now() - datetime.timedelta(hours=random.randint(0,7))).strftime("%H:%M:%S"),
-        'ID_Hora_Llegada': datetime.time(datetime.datetime.now().day, datetime.datetime.now().minute, datetime.datetime.now().second).isoformat(),
+        'ID_Hora_Llegada': datetime.time(datetime.datetime.now().hour, datetime.datetime.now().minute, datetime.datetime.now().second).isoformat(),
         'ID_Avion': planes[random.randint(1, len(planes)-1)][0] 
     }
 
